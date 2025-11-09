@@ -1,0 +1,17 @@
+{
+  "lammps": {
+    "wall_time_seconds": null,
+    "cpu_percent_max": null,
+    "ram_mb_max": null
+  },
+  "gromacs": {
+    "wall_time_seconds": null,
+    "cpu_percent_max": null,
+    "ram_mb_max": null
+  },
+  "espresso": {
+    "wall_time_seconds": null,
+    "cpu_percent_max": null,
+    "ram_mb_max": null
+  }
+}

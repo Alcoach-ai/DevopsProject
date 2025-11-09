@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/mnt/c/Users/gotom/OneDrive/Рабочий стол/DevOps/benchmarks/espresso/input.py", line 1, in <module>
+    import espressomd
+ModuleNotFoundError: No module named 'espressomd'
+elapsed_time_seconds: 
