@@ -8,17 +8,20 @@ SIMS = {
     "lammps": {
         "workdir": "benchmarks/lammps",
         "run_script": "run.sh",
-        "log": "log.lammps"
+        "log": "log.lammps",
+        "docker_image": "lammps-bench"
     },
     "gromacs": {
         "workdir": "benchmarks/gromacs",
         "run_script": "run.sh",
-        "log": "gromacs.log"
+        "log": "gromacs.log",
+        "docker_image": "gromacs-bench"
     },
     "espresso": {
         "workdir": "benchmarks/espresso",
         "run_script": "run.sh",
-        "log": "espresso.log"
+        "log": "espresso.log",
+        "docker_image": "espresso-bench"
     }
 }
 
@@ -28,11 +31,34 @@ METRICS_SCRIPT = "scripts/metrics.py"
 def run_sim(name, sim):
     print(f"\n===== RUN {name.upper()} =====")
     wd = sim["workdir"]
-    out = subprocess.run(["bash", sim["run_script"]], cwd=wd)
+    docker_image = sim["docker_image"]
+    
+    # Получаем абсолютный путь к benchmarks директории
+    project_root = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+    benchmarks_path = os.path.join(project_root, "benchmarks")
+    workdir_abs = os.path.join(project_root, wd)
+    
+    # Запускаем Docker контейнер с монтированием benchmarks директории
+    # Используем --rm для автоматического удаления контейнера после выполнения
+    docker_cmd = [
+        "docker", "run", "--rm",
+        "-v", f"{workdir_abs}:/workspace",
+        "-w", "/workspace",
+        docker_image,
+        "bash", sim["run_script"]
+    ]
+    
+    print(f"Running: {' '.join(docker_cmd)}")
+    out = subprocess.run(docker_cmd)
+    
     log_path = os.path.join(wd, sim["log"])
     out_json = os.path.join(RESULTS_DIR, f"{name}.json")
-    subprocess.run([sys.executable, METRICS_SCRIPT, log_path, out_json])
-    print(f"Metrics saved to {out_json}")
+    
+    if os.path.exists(log_path):
+        subprocess.run([sys.executable, METRICS_SCRIPT, log_path, out_json])
+        print(f"Metrics saved to {out_json}")
+    else:
+        print(f"Warning: Log file {log_path} not found!")
 
 def main():
     os.makedirs(RESULTS_DIR, exist_ok=True)
