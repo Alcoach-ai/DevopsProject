@@ -52,6 +52,7 @@ def run_sim(name, sim):
     out = subprocess.run(docker_cmd)
     
     log_path = os.path.join(wd, sim["log"])
+    json_metrics_path = os.path.join(wd, "gromacs_metrics.json")
     out_json = os.path.join(RESULTS_DIR, f"{name}.json")
     
     if os.path.exists(log_path):
@@ -59,6 +60,21 @@ def run_sim(name, sim):
         print(f"Metrics saved to {out_json}")
     else:
         print(f"Warning: Log file {log_path} not found!")
+
+    if os.path.exists(json_metrics_path):
+        with open(json_metrics_path) as f:
+            metrics = json.load(f)
+        # Save to RESULTS_DIR
+        with open(out_json, 'w') as f:
+            json.dump(metrics, f, indent=2)
+        print(f"Metrics saved to {out_json}")
+    else:
+        # Fallback: parse log (older method)
+        if os.path.exists(log_path):
+            subprocess.run([sys.executable, METRICS_SCRIPT, log_path, out_json])
+            print(f"Metrics saved to {out_json}")
+        else:
+            print(f"Warning: Log file not found for {name}!")
 
 def main():
     os.makedirs(RESULTS_DIR, exist_ok=True)

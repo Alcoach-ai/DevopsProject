@@ -56,20 +56,22 @@ python scripts/runner.py lammps   # Запуск только lammps
 ```json
 {
   "lammps": { "wall_time_seconds": 3.04, "cpu_percent_max": null, "ram_mb_max": null },
-  "gromacs": { "wall_time_seconds": 2.21, ...},
+  "gromacs": { "wall_time_seconds": 12.55, "cpu_percent_max": 109.7, "ram_mb_max": 115.88 },
   ...
 }
 ```
 - `wall_time_seconds` — время выполнения от запуска до окончания симуляции
-- `cpu_percent_max`, `ram_mb_max` пока не реализованы (можно добавить через расширение metrics.py)
+- `cpu_percent_max` — maximum CPU usage during simulation (implemented for GROMACS)
+- `ram_mb_max` — maximum RAM usage in MB (implemented for GROMACS)
+Note: CPU and RAM metrics are currently implemented only for GROMACS; other simulators still report null.
 
 ## FAQ
 - **Q:** Можно ли запускать вручную из-под Windows?  
   **A:** Да, если установлен bash и все зависимости. Но проще и надёжнее — использовать Docker.
 - **Q:** Как генерировать input.tpr для GROMACS?
   **A:** Необходимо подготовить .gro/.top/.mdp и собрать tpr через gmx grompp (см. оф. инструкции GROMACS).
-- **Q:** Как сделать метрики по CPU/RAM?
-  **A:** Добавьте соответствующий код в scripts/metrics.py (например, через psutil, top, time -v …).
+- **Q:** How to get CPU/RAM metrics?
+  **A:** CPU and RAM monitoring is now implemented for GROMACS via psutil in run_gromacs.py. You can extend metrics.py similarly for other simulators.
 
 ---
 Проект открыт для pull request и пожеланий!
